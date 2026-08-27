@@ -60,7 +60,7 @@ export default function InstallPrompt() {
           color: '#0c0e12', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 22,
         }}><Icon name="dumbbell" /></span>
         <div style={{ flex: 1, minWidth: 0 }}>
-          <div style={{ fontWeight: 600 }}>{t('Install openGym')}</div>
+          <div style={{ fontWeight: 600 }}>{t('Install PacinAngle')}</div>
           <div className="small" style={{ opacity: .7 }}>{t('Add it to your home screen for a full-screen app.')}</div>
         </div>
         <button onClick={dismiss} aria-label={t('Dismiss')} style={{

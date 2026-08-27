@@ -1,6 +1,6 @@
 {
-  "name": "openGym",
-  "short_name": "openGym",
+  "name": "PacinAngle",
+  "short_name": "PacinAngle",
   "description": "Personal gym & body weight tracker",
   "start_url": "./",
   "scope": "./",
