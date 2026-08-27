@@ -13,6 +13,7 @@ import TabBar from './components/TabBar.jsx'
 import ErrorBoundary from './components/ErrorBoundary.jsx'
 import Modals from './components/Modals.jsx'
 import Toast from './components/Toast.jsx'
+import InstallPrompt from './components/InstallPrompt.jsx'
 import RestTimer from './components/RestTimer.jsx'
 import Login from './views/Login.jsx'
 import Home from './views/Home.jsx'
@@ -87,6 +88,7 @@ function Shell() {
       <RestTimer />
       <Modals />
       <Toast />
+      <InstallPrompt />
     </>
   )
 }
