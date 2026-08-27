@@ -1,0 +1,19 @@
+# Dependencies
+node_modules/
+
+# Build output
+dist/
+frontend/dist/
+
+# Self-host server data — SECRETS (session key, VAPID keys, user db). Never commit.
+data/
+
+# Exercise media (~140 MB; served from the jsDelivr CDN in production)
+media/
+
+# Local docker env (root). NOTE: frontend/.env.production IS committed — Vercel needs it.
+/.env
+
+# Misc
+.DS_Store
+*.log
