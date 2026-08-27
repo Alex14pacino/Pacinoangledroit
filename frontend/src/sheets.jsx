@@ -565,6 +565,13 @@ function ExConfig({ ex, existing, onSave, onDelete, close, routine }) {
         {!bw && <Stepper label={t('Weight ({0})', st.unit)} value={c.weight} step={2.5} onChange={v => setC(x => ({ ...x, weight: v }))} />}
       </>}
     </div>
+    <div style={{ marginBottom: 16 }}>
+      <div className="small dim" style={{ margin: '0 2px 6px' }}>{t('Notes')}</div>
+      <textarea className="input" value={c.note || ''} maxLength={500} rows={2}
+        placeholder={t('e.g. tempo, form cue, machine setting…')}
+        onChange={e => setC(x => ({ ...x, note: e.target.value }))}
+        style={{ width: '100%', minHeight: 60, resize: 'vertical', fontFamily: 'inherit', lineHeight: 1.4 }} />
+    </div>
     {mode === 'time' && !bw && <div className="small dim" style={{ marginBottom: 18 }}>
       {t('A timer runs while you hold the set. Leave the weight at 0 for bodyweight holds.')}
     </div>}
@@ -604,13 +611,6 @@ function ExConfig({ ex, existing, onSave, onDelete, close, routine }) {
         : t('Reps climb by one whenever every set was clean. Set a ceiling to add sets instead of reps forever.')}
     </div>}
     {SHOW_EX_PROGRESSION && <ProgressionFields ex={ex} mode={mode} c={c} setC={setC} routine={routine} unit={st.unit} />}
-    <div style={{ marginBottom: 16 }}>
-      <div className="small dim" style={{ margin: '0 2px 6px' }}>{t('Notes')}</div>
-      <textarea className="input" value={c.note || ''} maxLength={500} rows={2}
-        placeholder={t('e.g. tempo, form cue, machine setting…')}
-        onChange={e => setC(x => ({ ...x, note: e.target.value }))}
-        style={{ width: '100%', minHeight: 60, resize: 'vertical', fontFamily: 'inherit', lineHeight: 1.4 }} />
-    </div>
     <Button variant="primary" onClick={save}>{existing ? t('Save') : t('Add to routine')}</Button>
     {ex.custom && <><div style={{ height: 8 }} /><Button icon="pencil" onClick={() => { close(); customExSheet(ex) }}>{t('Edit or delete this exercise')}</Button></>}
     {onDelete && <><div style={{ height: 8 }} /><Button variant="danger" onClick={() => { close(); onDelete() }}>{t('Remove from routine')}</Button></>}
