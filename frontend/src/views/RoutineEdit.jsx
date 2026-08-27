@@ -14,6 +14,9 @@ import { POLICIES_FOR, POLICY_NAME, POLICY_DESC } from '../lib/progression.js'
 import BodyMap from '../components/BodyMap.jsx'
 import { loadOfRoutine, rankOf, MUSCLE_NAME } from '../lib/muscles.js'
 
+// Progression picker hidden for now (kept in code — flip to true to bring it back).
+const SHOW_PROGRESSION = false
+
 export default function RoutineEdit() {
   const nav = useNavigate()
   const { id } = useParams()
@@ -49,14 +52,16 @@ export default function RoutineEdit() {
       <button className="iconbtn" aria-label={t('Pick an icon')} onClick={() => glyphPicker(r.emoji, g => update(s => { findRoutine(s, id).emoji = g }))}><Icon name={glyphOf(r.emoji)} /></button>
     </div>
 
-    <div className="sect-b" style={{ marginBottom: 16 }}>
-      <SelectRow icon="chartLine" title={t('Progression')} sheetTitle={t('Progression')}
-        value={r.prog || 'linear'} onChange={v => update(s => { findRoutine(s, id).prog = v })}
-        options={POLICIES_FOR.reps.map(p => ({ value: p, label: t(POLICY_NAME[p]), subtitle: t(POLICY_DESC[p]) }))} />
-    </div>
-    <div className="small dim" style={{ margin: '-10px 2px 16px' }}>
-      {t('Applies to every exercise in this routine that does not set its own rule.')}
-    </div>
+    {SHOW_PROGRESSION && <>
+      <div className="sect-b" style={{ marginBottom: 16 }}>
+        <SelectRow icon="chartLine" title={t('Progression')} sheetTitle={t('Progression')}
+          value={r.prog || 'linear'} onChange={v => update(s => { findRoutine(s, id).prog = v })}
+          options={POLICIES_FOR.reps.map(p => ({ value: p, label: t(POLICY_NAME[p]), subtitle: t(POLICY_DESC[p]) }))} />
+      </div>
+      <div className="small dim" style={{ margin: '-10px 2px 16px' }}>
+        {t('Applies to every exercise in this routine that does not set its own rule.')}
+      </div>
+    </>}
 
     {r.ex.length ? <div className="list">{r.ex.map((e, i) => {
       // An unresolvable id is shown rather than skipped — hiding it left an entry you
