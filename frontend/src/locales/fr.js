@@ -218,6 +218,8 @@ export default {
   'My plan': 'Mon plan',
   'Activate a plan first': 'Active d’abord un plan',
   'Starter plan loaded — Push · Pull · Legs': 'Plan de départ chargé — Push · Pull · Jambes',
+  'Notes': 'Remarques',
+  'e.g. tempo, form cue, machine setting…': 'ex. tempo, consigne technique, réglage machine…',
   'Install PacinAngle': 'Installer PacinAngle',
   'Add it to your home screen for a full-screen app.': 'Ajoute-le à ton écran d’accueil pour une app en plein écran.',
   'Install': 'Installer',
