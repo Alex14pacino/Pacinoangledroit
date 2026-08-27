@@ -463,6 +463,9 @@ function ExercisePicker({ onPick, close }) {
 export const exercisePicker = onPick => ui().openSheet(close => <ExercisePicker onPick={onPick} close={close} />)
 
 /* ============================ exercise config ============================ */
+// Per-exercise progression picker hidden for now (kept in code — flip to true to bring it back).
+const SHOW_EX_PROGRESSION = false
+
 // Progression settings for one exercise (issue #17). Shown inside the config sheet because
 // "how does this lift go up" belongs next to sets and reps, not in a separate screen. Left
 // on "follow the routine" it inherits, so most people never touch it.
@@ -597,7 +600,7 @@ function ExConfig({ ex, existing, onSave, onDelete, close, routine }) {
         ? t('Reps climb to {0}, then a set is added and the reps start over. At {1} sets it asks you to add weight instead.', c.repsMax, MAX_BW_SETS)
         : t('Reps climb by one whenever every set was clean. Set a ceiling to add sets instead of reps forever.')}
     </div>}
-    <ProgressionFields ex={ex} mode={mode} c={c} setC={setC} routine={routine} unit={st.unit} />
+    {SHOW_EX_PROGRESSION && <ProgressionFields ex={ex} mode={mode} c={c} setC={setC} routine={routine} unit={st.unit} />}
     <Button variant="primary" onClick={save}>{existing ? t('Save') : t('Add to routine')}</Button>
     {ex.custom && <><div style={{ height: 8 }} /><Button icon="pencil" onClick={() => { close(); customExSheet(ex) }}>{t('Edit or delete this exercise')}</Button></>}
     {onDelete && <><div style={{ height: 8 }} /><Button variant="danger" onClick={() => { close(); onDelete() }}>{t('Remove from routine')}</Button></>}
