@@ -4,7 +4,7 @@ import { EXIDX } from '../lib/exercises.js'
 import { fmtNum, fmtDate, isoOf, todayISO } from '../lib/format.js'
 import { t } from '../lib/i18n.js'
 import { activePlan } from '../lib/history.js'
-import { entryTonnage, workoutTonnage, planWorkouts, planCycles } from '../lib/tonnage.js'
+import { entryTonnage, planWorkouts, planCycles } from '../lib/tonnage.js'
 import LineChart from './LineChart.jsx'
 import Icon from './Icon.jsx'
 import { Button, Segmented, SelectRow } from './ui.jsx'
@@ -39,11 +39,7 @@ export default function PlanStats() {
   else { from = anchor - win * DAY; to = anchor }
   const inWin = all.filter(w => (w.start || 0) >= from && (w.start || 0) <= to)
 
-  // Card A — tonnage per séance
-  const perSession = inWin.map(w => ({ t: w.start, y: workoutTonnage(w), d: w.d }))
-  const totalTon = perSession.reduce((n, p) => n + p.y, 0)
-
-  // Card B — tonnage per exercise (of the selected exercise, over the window)
+  // Tonnage per exercise (of the selected exercise, over the window)
   const exIds = [...new Set(inWin.flatMap(w => w.entries.map(e => e.id)))]
     .filter(id => EXIDX[id]).sort((a, b) => (EXIDX[a].n < EXIDX[b].n ? -1 : 1))
   const curEx = exId && exIds.includes(exId) ? exId : exIds[0] || null
@@ -93,6 +89,22 @@ export default function PlanStats() {
       </div>
     </div>
 
+    {/* 1) Plan progression — tonnage per completed cycle. The whole-plan evolution curve;
+        calendar-independent, so it ignores the window control below (which drives the
+        per-exercise card only). */}
+    {cyclePts.length > 0 && <div className="card">
+      <div className="row between" style={{ alignItems: 'flex-end' }}>
+        <h2 style={{ margin: 0 }}>{t('Plan progression')}</h2>
+        <div style={{ textAlign: 'right' }}><div className="stat-v">{doneCycles}</div><div className="small dim">{t('cycles completed')}</div></div>
+      </div>
+      <div className="chart" style={{ marginTop: 8 }}><LineChart points={cyclePts} h={150} unit={unit} color="var(--purple)" /></div>
+      <div className="small dim" style={{ marginTop: 8 }}>{t('Total tonnage each time you complete every workout in the plan — one full rotation, whatever the calendar.')}</div>
+      {lastCycle && !lastCycle.complete && <div className="small" style={{ color: 'var(--yellow)', marginTop: 4 }}>
+        {t('Last point: cycle {0} in progress — {1} of {2} workouts done.', lastCycle.n, lastCycle.done, lastCycle.need)}
+      </div>}
+    </div>}
+
+    {/* Window controls — drive the per-exercise card below */}
     <Segmented className="seg-range" value={custom ? '_c' : win} onChange={setWinPreset}
       options={[{ value: 7, label: t('Week') }, { value: 30, label: '30d' }, { value: 90, label: '90d' }, { value: 0, label: t('All') }]} />
     <div className="row" style={{ gap: 8, margin: '8px 0 4px' }}>
@@ -107,44 +119,19 @@ export default function PlanStats() {
         onChange={e => setCustom(c => ({ from: (c?.from || startIso), to: e.target.value }))} />
     </div>}
 
-    {!inWin.length ? <div className="card"><div className="muted small">{t('No sessions in this range.')}</div></div> : <>
-      {/* A — tonnage per séance */}
-      <div className="card">
-        <div className="row between" style={{ alignItems: 'flex-end' }}>
-          <h2 style={{ margin: 0 }}>{t('Tonnage per session')}</h2>
-          <div style={{ textAlign: 'right' }}><div className="stat-v">{money(totalTon)}</div><div className="small dim">{t('total')}</div></div>
+    {/* 2) Tonnage per exercise (windowed) */}
+    <div className="card">
+      <h2>{t('Tonnage per exercise')}</h2>
+      {!inWin.length ? <div className="muted small">{t('No sessions in this range.')}</div>
+        : curEx ? <>
+        <div className="sect-b" style={{ marginBottom: 10 }}>
+          <SelectRow title={t('Exercise')} sheetTitle={t('Tonnage per exercise')} value={curEx} onChange={setExId}
+            options={exIds.map(id => ({ value: id, label: EXIDX[id].n }))} />
         </div>
-        <div className="chart" style={{ marginTop: 8 }}><LineChart points={perSession} h={150} unit={unit} color="var(--acc)" /></div>
-      </div>
-
-      {/* B — tonnage per exercise */}
-      <div className="card">
-        <h2>{t('Tonnage per exercise')}</h2>
-        {curEx ? <>
-          <div className="sect-b" style={{ marginBottom: 10 }}>
-            <SelectRow title={t('Exercise')} sheetTitle={t('Tonnage per exercise')} value={curEx} onChange={setExId}
-              options={exIds.map(id => ({ value: id, label: EXIDX[id].n }))} />
-          </div>
-          <div className="chart"><LineChart points={exPts} h={150} unit={unit} color="var(--blue)" /></div>
-          <div className="small dim" style={{ marginTop: 8 }}>{t('Total for this exercise')} · <b className="accent">{money(exTotal)}</b></div>
-        </> : <div className="muted small">{t('No exercises in this range.')}</div>}
-      </div>
-
-    </>}
-
-    {/* C — tonnage per completed cycle. Outside the window block: it's the whole-plan view,
-        the smooth "am I doing more each full rotation" curve, immune to schedule drift. */}
-    {cyclePts.length > 0 && <div className="card">
-      <div className="row between" style={{ alignItems: 'flex-end' }}>
-        <h2 style={{ margin: 0 }}>{t('Plan progression')}</h2>
-        <div style={{ textAlign: 'right' }}><div className="stat-v">{doneCycles}</div><div className="small dim">{t('cycles completed')}</div></div>
-      </div>
-      <div className="chart" style={{ marginTop: 8 }}><LineChart points={cyclePts} h={150} unit={unit} color="var(--purple)" /></div>
-      <div className="small dim" style={{ marginTop: 8 }}>{t('Total tonnage each time you complete every workout in the plan — one full rotation, whatever the calendar.')}</div>
-      {lastCycle && !lastCycle.complete && <div className="small" style={{ color: 'var(--yellow)', marginTop: 4 }}>
-        {t('Last point: cycle {0} in progress — {1} of {2} workouts done.', lastCycle.n, lastCycle.done, lastCycle.need)}
-      </div>}
-    </div>}
+        <div className="chart"><LineChart points={exPts} h={150} unit={unit} color="var(--blue)" /></div>
+        <div className="small dim" style={{ marginTop: 8 }}>{t('Total for this exercise')} · <b className="accent">{money(exTotal)}</b></div>
+      </> : <div className="muted small">{t('No exercises in this range.')}</div>}
+    </div>
 
     <div className="small dim" style={{ margin: '2px 2px 18px' }}>
       <Icon name="info" style={{ fontSize: 12 }} /> {t('Tonnage = weight × reps on completed sets; bodyweight sets count as weight 1.')}
