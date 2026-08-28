@@ -244,6 +244,7 @@ export default {
   'Sign in or create an account': 'Se connecter ou créer un compte',
   'Sync your data across your devices.': 'Synchronise tes données sur tous tes appareils.',
   'Plan stats': 'Stats du plan',
+  'ongoing': 'en cours',
   'Tonnage per session': 'Tonnage par séance',
   'Tonnage per exercise': 'Tonnage par exercice',
   'Plan progression': 'Progression du plan',

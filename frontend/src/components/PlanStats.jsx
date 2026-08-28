@@ -67,10 +67,23 @@ export default function PlanStats() {
       <h4 className="sec" style={{ margin: 0 }}>{t('Plan stats')}</h4>
     </div>
 
-    {trained.length > 1 && <div className="sect-b" style={{ marginBottom: 12 }}>
+    {trained.length > 1 && <div className="sect-b" style={{ marginBottom: 10 }}>
       <SelectRow icon="clipboard" title={t('Plan')} sheetTitle={t('Plan stats')} value={plan.id} onChange={setPlanId}
         options={[...trained].reverse().map(p => ({ value: p.id, label: p.name, subtitle: p.status === 'active' ? t('Active') : t('Archived') }))} />
     </div>}
+
+    {/* Which plan these numbers are for — always shown, so an archived plan is never mistaken
+        for the current one. */}
+    <div className="card" style={{ marginBottom: 12, padding: '11px 13px' }}>
+      <div className="row" style={{ gap: 8, alignItems: 'center' }}>
+        <span className="lrow-i" style={{ width: 30, height: 30, fontSize: 15, background: plan.status === 'active' ? 'var(--acc)' : 'var(--surface-3)', color: plan.status === 'active' ? '#0c0e12' : 'inherit' }}><Icon name="clipboard" /></span>
+        <div className="grow" style={{ minWidth: 0 }}>
+          <div className="tt" style={{ fontWeight: 600 }}>{plan.name}</div>
+          <div className="small dim">{fmtDate(isoOf(new Date(planStart)), true)} – {plan.endedAt ? fmtDate(isoOf(new Date(plan.endedAt)), true) : t('ongoing')}</div>
+        </div>
+        <span className={'tag' + (plan.status === 'active' ? ' acc' : '')}>{plan.status === 'active' ? t('Active') : t('Archived')}</span>
+      </div>
+    </div>
 
     <Segmented className="seg-range" value={custom ? '_c' : win} onChange={setWinPreset}
       options={[{ value: 7, label: t('Week') }, { value: 30, label: '30d' }, { value: 90, label: '90d' }, { value: 0, label: t('All') }]} />
