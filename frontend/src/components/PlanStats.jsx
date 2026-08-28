@@ -1,10 +1,10 @@
 import { useState } from 'react'
 import { useStore } from '../store/useStore.js'
 import { EXIDX } from '../lib/exercises.js'
-import { fmtNum, fmtDate, isoOf } from '../lib/format.js'
+import { fmtNum, fmtDate, isoOf, todayISO } from '../lib/format.js'
 import { t } from '../lib/i18n.js'
 import { activePlan } from '../lib/history.js'
-import { entryTonnage, workoutTonnage, planWorkouts } from '../lib/tonnage.js'
+import { entryTonnage, workoutTonnage, planWorkouts, planCycles } from '../lib/tonnage.js'
 import LineChart from './LineChart.jsx'
 import Icon from './Icon.jsx'
 import { Button, Segmented, SelectRow } from './ui.jsx'
@@ -53,9 +53,17 @@ export default function PlanStats() {
   }).filter(Boolean) : []
   const exTotal = exPts.reduce((n, p) => n + p.y, 0)
 
-  // Card C — cumulative tonnage across the window (the "progression" from start to end)
-  let run = 0
-  const cumPts = perSession.map(p => ({ t: p.t, y: (run += p.y), d: p.d }))
+  // Card C — tonnage per completed CYCLE (a full pass through the plan; calendar-independent,
+  // so it isn't affected by the time window above — it's the whole plan, start to finish).
+  const cycles = planCycles(S, plan)
+  const cyclePts = cycles.map(c => ({
+    t: c.endDate ? new Date(c.endDate + 'T12:00:00').getTime() : Date.now(),
+    y: c.tonnage,
+    d: c.endDate || todayISO(),
+    note: c.complete ? t('cycle {0}', c.n) : t('cycle {0} · {1}/{2}', c.n, c.done, c.need),
+  }))
+  const doneCycles = cycles.filter(c => c.complete).length
+  const lastCycle = cycles[cycles.length - 1]
 
   const setWinPreset = v => { setWin(v); setCustom(null); setShowCustom(false) }
   const startIso = isoOf(new Date(planStart)), endIso = isoOf(new Date(anchor))
@@ -122,16 +130,21 @@ export default function PlanStats() {
         </> : <div className="muted small">{t('No exercises in this range.')}</div>}
       </div>
 
-      {/* C — cumulative tonnage across the plan window */}
-      <div className="card">
-        <div className="row between" style={{ alignItems: 'flex-end' }}>
-          <h2 style={{ margin: 0 }}>{t('Plan progression')}</h2>
-          <div style={{ textAlign: 'right' }}><div className="stat-v">{money(run)}</div><div className="small dim">{t('cumulative')}</div></div>
-        </div>
-        <div className="chart" style={{ marginTop: 8 }}><LineChart points={cumPts} h={150} unit={unit} color="var(--purple)" /></div>
-        <div className="small dim" style={{ marginTop: 8 }}>{t('Total tonnage lifted, adding up session by session across the plan.')}</div>
-      </div>
     </>}
+
+    {/* C — tonnage per completed cycle. Outside the window block: it's the whole-plan view,
+        the smooth "am I doing more each full rotation" curve, immune to schedule drift. */}
+    {cyclePts.length > 0 && <div className="card">
+      <div className="row between" style={{ alignItems: 'flex-end' }}>
+        <h2 style={{ margin: 0 }}>{t('Plan progression')}</h2>
+        <div style={{ textAlign: 'right' }}><div className="stat-v">{doneCycles}</div><div className="small dim">{t('cycles completed')}</div></div>
+      </div>
+      <div className="chart" style={{ marginTop: 8 }}><LineChart points={cyclePts} h={150} unit={unit} color="var(--purple)" /></div>
+      <div className="small dim" style={{ marginTop: 8 }}>{t('Total tonnage each time you complete every workout in the plan — one full rotation, whatever the calendar.')}</div>
+      {lastCycle && !lastCycle.complete && <div className="small" style={{ color: 'var(--yellow)', marginTop: 4 }}>
+        {t('Last point: cycle {0} in progress — {1} of {2} workouts done.', lastCycle.n, lastCycle.done, lastCycle.need)}
+      </div>}
+    </div>}
 
     <div className="small dim" style={{ margin: '2px 2px 18px' }}>
       <Icon name="info" style={{ fontSize: 12 }} /> {t('Tonnage = weight × reps on completed sets; bodyweight sets count as weight 1.')}
