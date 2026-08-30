@@ -431,6 +431,9 @@ function ExercisePicker({ onPick, close, tags }) {
     (bp === '★' ? usage[e.id] : (!bp || e.bp === bp)) &&
     (!ql || e.n.toLowerCase().includes(ql) || e.tg.includes(ql) || e.eq.includes(ql) || (e.desc || '').toLowerCase().includes(ql)))
   if (bp === '★') base = [...base].sort((a, b) => (usage[b.id] - usage[a.id]) || (a.n < b.n ? -1 : 1))
+  // Otherwise float already-used exercises (the ones showing a ★) to the top, keeping the
+  // dataset order within each group — a stable sort, so nothing else is reshuffled.
+  else base = [...base].sort((a, b) => (usage[a.id] ? 0 : 1) - (usage[b.id] ? 0 : 1))
   const eqOpts = equipmentOf(base)
   // Drop the equipment filter if the search narrowed it away, so you never hit a dead end.
   const eqOn = eqOpts.includes(eq) ? eq : ''
