@@ -9,7 +9,7 @@ import { getDoc, setDoc } from 'firebase/firestore'
 
 const KEY = 'gym_state_v1'
 export const DEF = {
-  unit: 'kg', restSec: 90, sound: true, keepAwake: true, lang: 'en',
+  unit: 'kg', restSec: 90, sound: true, keepAwake: true, lang: 'fr',
   theme: 'dark', accent: 'lime', body: 'male', targetW: null,
   bodyweight: [], plans: [],
   exWeights: {}, workouts: [], active: null, customEx: [], gifSize: 'full',
@@ -36,6 +36,9 @@ function migrate(S) {
   }
   delete S.week; delete S.dayPlan
   if (!Array.isArray(S.plans)) S.plans = []
+  // This build is French-only, kilos-only (personal use) — the pickers for both are gone.
+  S.lang = 'fr'
+  S.unit = 'kg'
   return S
 }
 
