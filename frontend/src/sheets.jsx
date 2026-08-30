@@ -465,6 +465,9 @@ export const exercisePicker = onPick => ui().openSheet(close => <ExercisePicker 
 /* ============================ exercise config ============================ */
 // Per-exercise progression picker hidden for now (kept in code — flip to true to bring it back).
 const SHOW_EX_PROGRESSION = false
+// Bodyweight / reps-per-side toggles hidden for now (kept in code — flip to true to bring back).
+// The bodyweight flag still comes from the exercise dataset default, so logging stays correct.
+const SHOW_EX_TOGGLES = false
 
 // Progression settings for one exercise (issue #17). Shown inside the config sheet because
 // "how does this lift go up" belongs next to sets and reps, not in a separate screen. Left
@@ -576,7 +579,7 @@ function ExConfig({ ex, existing, onSave, onDelete, close, routine }) {
       {t('A timer runs while you hold the set. Leave the weight at 0 for bodyweight holds.')}
     </div>}
     {/* ---------- bodyweight + per side (issues #31/#32/#33) ---------- */}
-    {!cardio && <div className="sect-b" style={{ marginBottom: 8 }}>
+    {!cardio && SHOW_EX_TOGGLES && <div className="sect-b" style={{ marginBottom: 8 }}>
       <Row icon="figureStrength" iconTint="var(--acc)" title={t('Bodyweight')}
         subtitle={bw ? t('No weight to enter — just log the reps.') : t('Ask for a weight on every set.')}>
         <Switch checked={bw} onChange={v => setC(x => ({ ...x, bodyweight: v, weight: v ? 0 : x.weight }))} />
