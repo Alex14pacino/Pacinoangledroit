@@ -219,6 +219,7 @@ export default {
   'Activate a plan first': 'Active d’abord un plan',
   'Starter plan loaded — Push · Pull · Legs': 'Plan de départ chargé — Push · Pull · Jambes',
   'Notes': 'Remarques',
+  'A timer runs while you hold the set. Adjust the duration 30 seconds at a time.': 'Un minuteur tourne pendant que tu tiens la position. Ajuste la durée par tranches de 30 secondes.',
   'e.g. tempo, form cue, machine setting…': 'ex. tempo, consigne technique, réglage machine…',
   'Install PacinAngle': 'Installer PacinAngle',
   'Add it to your home screen for a full-screen app.': 'Ajoute-le à ton écran d’accueil pour une app en plein écran.',

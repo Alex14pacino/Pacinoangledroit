@@ -526,7 +526,7 @@ function ExConfig({ ex, existing, onSave, onDelete, close, routine }) {
     const note = (c.note || '').trim()
     const meta = note ? { note } : {}
     if (cardio) onSave({ sets, min: Math.max(1, Math.round(c.min) || 20), speed: Math.max(0, c.speed || 8), ...meta })
-    else if (mode === 'time') onSave({ sets, mode: 'time', sec: Math.max(1, Math.round(c.sec) || 45), weight: Math.max(0, c.weight || 0), ...flags, ...prog, ...meta })
+    else if (mode === 'time') onSave({ sets: 1, mode: 'time', sec: Math.max(1, Math.round(c.sec) || 45), ...flags, ...prog, ...meta })
     else {
       // A unilateral target is stored even: the split has to divide, and a typed 15 would
       // otherwise plan seven reps on one side and eight on the other, every session.
@@ -557,9 +557,7 @@ function ExConfig({ ex, existing, onSave, onDelete, close, routine }) {
         <Stepper label={t('Minutes')} value={c.min} step={1} decimal={false} onChange={v => setC(x => ({ ...x, min: v }))} />
         <Stepper label={t('Speed (km/h)')} value={c.speed} step={0.5} onChange={v => setC(x => ({ ...x, speed: v }))} />
       </> : mode === 'time' ? <>
-        <Stepper label={t('Sets')} value={c.sets} step={1} decimal={false} onChange={v => setC(x => ({ ...x, sets: v }))} />
-        <Stepper label={t('Seconds')} value={c.sec} step={5} decimal={false} onChange={v => setC(x => ({ ...x, sec: v }))} />
-        <Stepper label={t('Weight ({0})', st.unit)} value={c.weight} step={2.5} onChange={v => setC(x => ({ ...x, weight: v }))} />
+        <Stepper label={t('Seconds')} value={c.sec} step={30} decimal={false} unit="s" onChange={v => setC(x => ({ ...x, sec: v }))} />
       </> : <>
         <Stepper label={t('Sets')} value={c.sets} step={1} decimal={false} onChange={v => setC(x => ({ ...x, sets: v }))} />
         <Stepper label={t('Reps')} value={c.reps} step={perSide ? 2 : 1} decimal={false} onChange={v => setC(x => ({ ...x, reps: v }))} />
@@ -575,8 +573,8 @@ function ExConfig({ ex, existing, onSave, onDelete, close, routine }) {
         onChange={e => setC(x => ({ ...x, note: e.target.value }))}
         style={{ width: '100%', minHeight: 60, resize: 'vertical', fontFamily: 'inherit', lineHeight: 1.4 }} />
     </div>
-    {mode === 'time' && !bw && <div className="small dim" style={{ marginBottom: 18 }}>
-      {t('A timer runs while you hold the set. Leave the weight at 0 for bodyweight holds.')}
+    {mode === 'time' && <div className="small dim" style={{ marginBottom: 18 }}>
+      {t('A timer runs while you hold the set. Adjust the duration 30 seconds at a time.')}
     </div>}
     {/* ---------- bodyweight + per side (issues #31/#32/#33) ---------- */}
     {!cardio && SHOW_EX_TOGGLES && <div className="sect-b" style={{ marginBottom: 8 }}>
