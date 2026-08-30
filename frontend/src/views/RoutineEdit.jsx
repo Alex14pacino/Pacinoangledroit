@@ -1,7 +1,7 @@
 import { useNavigate, useParams } from 'react-router-dom'
 import { useEffect } from 'react'
 import { useStore } from '../store/useStore.js'
-import { exOr } from '../lib/exercises.js'
+import { exOr, BODYPARTS } from '../lib/exercises.js'
 import { uid } from '../lib/format.js'
 import { t } from '../lib/i18n.js'
 import { supersetUnits, cleanupSg, exLine, findRoutine, planOfRoutine } from '../lib/history.js'
@@ -29,6 +29,13 @@ export default function RoutineEdit() {
   if (!r) return null
 
   const edit = fn => update(s => { fn(findRoutine(s, id).ex) })
+  // Body-part tags on the workout — they restrict what the exercise picker offers here.
+  const toggleTag = b => update(s => {
+    const rr = findRoutine(s, id)
+    const set = new Set(rr.tags || [])
+    set.has(b) ? set.delete(b) : set.add(b)
+    if (set.size) rr.tags = [...set]; else delete rr.tags
+  })
   const move = (i, dir) => edit(ex => { const j = i + dir; if (j < 0 || j >= ex.length) return;[ex[i], ex[j]] = [ex[j], ex[i]]; cleanupSg(ex) })
   const toggleLink = i => edit(ex => {
     if (i < 1) return
@@ -62,6 +69,14 @@ export default function RoutineEdit() {
         {t('Applies to every exercise in this routine that does not set its own rule.')}
       </div>
     </>}
+
+    <div className="sect-b" style={{ marginBottom: 6 }}>
+      <div className="small dim" style={{ margin: '0 2px 8px' }}>{t('Tags')} <span className="dim">· {t('limit which exercises are suggested here')}</span></div>
+      <div className="chips">
+        {BODYPARTS.map(b => <button key={b} className={'chip' + ((r.tags || []).includes(b) ? ' on' : '')} onClick={() => toggleTag(b)}>{t(b)}</button>)}
+      </div>
+    </div>
+    <div style={{ height: 14 }} />
 
     {r.ex.length ? <div className="list">{r.ex.map((e, i) => {
       // An unresolvable id is shown rather than skipped — hiding it left an entry you
@@ -101,7 +116,7 @@ export default function RoutineEdit() {
     })()}
 
     <div className="small dim row" style={{ margin: '10px 2px', gap: 5 }}><Icon name="link" style={{ fontSize: 13 }} />{t('Tap the link button on an exercise to superset it with the one above — you’ll do them back-to-back.')}</div>
-    <Button variant="primary" onClick={() => exercisePicker(ex => exConfigSheet(ex, null, cfg => edit(x => { x.push({ id: ex.id, ...cfg }) }), null, r))} icon="plus">{t('Add exercise')}</Button>
+    <Button variant="primary" onClick={() => exercisePicker(ex => exConfigSheet(ex, null, cfg => edit(x => { x.push({ id: ex.id, ...cfg }) }), null, r), r.tags)} icon="plus">{t('Add exercise')}</Button>
     <div style={{ height: 10 }} />
     <Button variant="danger" onClick={() => confirmSheet({
       title: t('Delete routine?'), message: t('“{0}” and its exercises will be removed.', r.name), confirmText: t('Delete'), danger: true,

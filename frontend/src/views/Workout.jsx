@@ -288,7 +288,7 @@ function ActiveWorkout() {
       const plan = nextPrescription(s, full, findRoutine(s, s.active.routineId))
       s.active.entries.push({ id: ex.id, target: { ...cfg }, plan, sets: applyPrescription(buildSets(s, full), plan) })
       s.active.cur = s.active.entries.length - 1
-    }), null, findRoutine(S, A.routineId)))} icon="plus">{t('Add exercise')}</Button>
+    }), null, findRoutine(S, A.routineId)), findRoutine(S, A.routineId)?.tags)} icon="plus">{t('Add exercise')}</Button>
     <div style={{ height: 10 }} />
     {(() => {
       const exDone = A.entries.filter(e => e.sets.length && e.sets.every(s => s.done)).length

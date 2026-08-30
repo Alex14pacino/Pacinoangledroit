@@ -51,7 +51,7 @@ function cleanEx(e) {
 /** Build the shareable bundle: the active plan's entraînements + referenced customs. */
 export function buildPlanBundle(S, name) {
   const routines = activeRoutines(S).map(r => ({
-    id: r.id, name: r.name, emoji: r.emoji, ...(r.prog ? { prog: r.prog } : {}), ex: (r.ex || []).map(cleanEx)
+    id: r.id, name: r.name, emoji: r.emoji, ...(r.prog ? { prog: r.prog } : {}), ...(r.tags?.length ? { tags: r.tags } : {}), ex: (r.ex || []).map(cleanEx)
   }))
   const usedIds = new Set(routines.flatMap(r => r.ex.map(e => e.id)))
   const customEx = (S.customEx || [])
@@ -128,6 +128,7 @@ export function mergePlan(s, bundle) {
       name: r.name || t('Shared routine'),
       emoji: r.emoji,
       ...(r.prog ? { prog: r.prog } : {}),
+      ...(Array.isArray(r.tags) && r.tags.length ? { tags: r.tags } : {}),
       ex: (r.ex || []).map(e => ({ ...e, id: exIdMap[e.id] || e.id }))
     })
   })
