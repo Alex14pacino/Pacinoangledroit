@@ -472,6 +472,9 @@ export const exercisePicker = (onPick, tags) => ui().openSheet(close => <Exercis
 /* ============================ exercise config ============================ */
 // Per-exercise progression picker hidden for now (kept in code — flip to true to bring it back).
 const SHOW_EX_PROGRESSION = false
+// Time mode retired — no Reps/Temps switch, every exercise is reps + weight (kept behind the
+// flag in case timed holds are wanted back). Cardio still auto-detects from the dataset.
+const SHOW_MODE_TOGGLE = false
 // Bodyweight / reps-per-side toggles hidden for now (kept in code — flip to true to bring back).
 // The bodyweight flag still comes from the exercise dataset default, so logging stays correct.
 const SHOW_EX_TOGGLES = false
@@ -555,7 +558,7 @@ function ExConfig({ ex, existing, onSave, onDelete, close, routine }) {
       <span className="tag">{t(ex.tg || ex.bp)}</span><span className="tag">{t(ex.eq)}</span>
     </div>
     {ex.desc && <div className="exnote">{ex.desc}</div>}
-    {!cardio && <div style={{ marginBottom: 14 }}>
+    {!cardio && SHOW_MODE_TOGGLE && <div style={{ marginBottom: 14 }}>
       <Segmented className="seg-range" value={mode} onChange={setMode}
         options={[{ value: 'reps', label: t('Reps') }, { value: 'time', label: t('Time') }]} />
     </div>}

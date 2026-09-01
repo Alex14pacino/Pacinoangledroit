@@ -39,6 +39,17 @@ function migrate(S) {
   // This build is French-only, kilos-only (personal use) — the pickers for both are gone.
   S.lang = 'fr'
   S.unit = 'kg'
+  // Time mode retired — every non-cardio exercise is reps + weight. Convert any lingering
+  // time-mode config to reps: routine configs and the in-progress session. Past séances in
+  // history keep whatever they were logged with.
+  const toReps = c => { if (c && c.mode === 'time') { c.mode = 'reps'; if (!(c.reps > 0)) c.reps = 10; delete c.sec } }
+  S.plans.forEach(p => (p.routines || []).forEach(r => (r.ex || []).forEach(toReps)))
+  if (S.active && Array.isArray(S.active.entries)) {
+    S.active.entries.forEach(e => {
+      toReps(e.target)
+      ;(e.sets || []).forEach(s => { if (s.sec != null && s.r == null) { s.r = (e.target && e.target.reps) || 10; delete s.sec } })
+    })
+  }
   return S
 }
 
