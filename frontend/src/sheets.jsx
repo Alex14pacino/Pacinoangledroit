@@ -529,9 +529,10 @@ function ExConfig({ ex, existing, onSave, onDelete, close, routine }) {
     // rather than carrying a flag nothing downstream can read.
     const flags = {}
     if (bw !== isBodyweightEq(ex.id)) flags.bodyweight = bw
-    // Free-text note kept on the exercise config; shown on the exercise while training.
+    // Free-text note + this exercise's own rest time (seconds). Both ride along on the config.
     const note = (c.note || '').trim()
-    const meta = note ? { note } : {}
+    const rest = Math.max(0, Math.round(Number(c.rest ?? st.restSec ?? 90)) || 0)
+    const meta = { ...(note ? { note } : {}), ...(rest ? { rest } : {}) }
     if (cardio) onSave({ sets, min: Math.max(1, Math.round(c.min) || 20), speed: Math.max(0, c.speed || 8), ...meta })
     else if (mode === 'time') onSave({ sets: 1, mode: 'time', sec: Math.max(1, Math.round(c.sec) || 45), ...flags, ...prog, ...meta })
     else {
@@ -572,6 +573,10 @@ function ExConfig({ ex, existing, onSave, onDelete, close, routine }) {
             until there is a belt to describe — see the added-weight row below. */}
         {!bw && <Stepper label={t('Weight ({0})', st.unit)} value={c.weight} step={2.5} onChange={v => setC(x => ({ ...x, weight: v }))} />}
       </>}
+    </div>
+    <div className="row cfgrow" style={{ marginBottom: 14 }}>
+      <Stepper label={t('Rest (s)')} value={c.rest ?? (st.restSec || 90)} step={15} decimal={false} unit="s"
+        onChange={v => setC(x => ({ ...x, rest: v }))} />
     </div>
     <div style={{ marginBottom: 16 }}>
       <div className="small dim" style={{ margin: '0 2px 6px' }}>{t('Notes')}</div>
@@ -813,12 +818,10 @@ export function beginWorkout(routineId, bw) {
   const st = S()
   const r = routineId ? findRoutine(st, routineId) : null
   const planId = (activePlan(st) || {}).id || null   // stamp the séance with the active plan (stats scope by it)
-  // The prescription is applied as the session is built, so you walk up to the bar with the
-  // right weight already on the screen instead of being told about it afterwards. `plan` is
-  // kept on the entry purely so the workout can explain the number it chose.
+  // No auto-progression: each set is simply seeded with what it was last time (buildSets),
+  // so a 15/20/10 session comes back exactly as 15/20/10 for you to adjust by hand.
   const entries = (r ? r.ex : []).map(cfg => {
-    const plan = nextPrescription(st, cfg, r)
-    return { id: cfg.id, sg: cfg.sg, target: { ...cfg }, plan, sets: applyPrescription(buildSets(st, cfg), plan) }
+    return { id: cfg.id, sg: cfg.sg, target: { ...cfg }, plan: null, sets: buildSets(st, cfg) }
   })
   update(s => {
     s.active = { id: uid(), d: todayISO(), start: Date.now(), routineId, planId, name: r ? r.name : t('Freestyle'), bw: bw || null, cur: 0, entries }

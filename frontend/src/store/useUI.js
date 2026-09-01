@@ -39,8 +39,9 @@ export const useUI = create((set, get) => ({
 
   startRest(sec) {
     get().stopRest()
-    const endsAt = Date.now() + sec * 1000
-    set({ timer: { left: sec, total: sec, endsAt } })
+    const now = Date.now()
+    const endsAt = now + sec * 1000
+    set({ timer: { left: sec, total: sec, endsAt, startedAt: now } })
     pushRestTimer(sec)
     timerTick = () => {
       const tm = get().timer
@@ -69,9 +70,16 @@ export const useUI = create((set, get) => ({
     pushRestTimer(left)
   },
   stopRest() {
+    const tm = get().timer
+    // Remember the rest that was actually taken: it becomes the default rest for exercises
+    // added next (issue: default rest = last consumed). Persisted locally, no server push.
+    if (tm && tm.startedAt) {
+      const elapsed = Math.max(1, Math.round((Date.now() - tm.startedAt) / 1000))
+      useStore.getState().update(s => { s.restSec = elapsed }, false)
+    }
     if (timerInt) clearInterval(timerInt); timerInt = null
     if (timerTick) document.removeEventListener('visibilitychange', timerTick); timerTick = null
-    if (get().timer) cancelPushRestTimer()
+    if (tm) cancelPushRestTimer()
     set({ timer: null })
   },
 

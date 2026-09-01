@@ -211,12 +211,13 @@ export function buildSets(S, cfg) {
     }
     return sets
   }
-  const conf = S.exWeights[cfg.id]
+  // Each set is seeded from what THAT set was last time (set 1 → last set 1, etc.), so a
+  // 15/20/10 session comes back as 15/20/10 — not a single "working weight" flattened across
+  // every set. Falls back to the plan's target for a set that has no prior.
   for (let i = 0; i < n; i++) {
     const prev = prevAt(i)
     const usable = prev && prev.r > 0 ? prev : null
-    const w = conf && conf.w > 0 ? conf.w : (usable ? usable.w : cfg.weight)
-    sets.push({ w, r: usable ? usable.r : cfg.reps, done: false })
+    sets.push({ w: usable ? usable.w : cfg.weight, r: usable ? usable.r : cfg.reps, done: false })
   }
   return sets
 }
