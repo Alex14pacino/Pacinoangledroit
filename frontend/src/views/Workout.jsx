@@ -220,8 +220,11 @@ function ActiveWorkout() {
         const isLastExInUnit = idx === unit[unit.length - 1]
         const unitDone = unit.every(ui => (ui === idx ? e : A.entries[ui]).sets.every(x => x.done))
         // Rest is per exercise (its own configured duration), not a global setting.
-        if (isLastExInUnit && !unitDone) startRest((e.target && e.target.rest) || S.restSec)
-        else if (unitDone) stopRest()
+        const rest = (e.target && e.target.rest) || S.restSec
+        if (isLastExInUnit && !unitDone) startRest(rest)
+        // Finishing an exercise also rests (its own duration) before the next one — except on
+        // the final exercise of the workout, where there's nothing to move on to.
+        else if (unitDone) { if (isLastUnit) stopRest(); else startRest(rest) }
         if (unitDone && isLastUnit) workoutDone = true      // last exercise's last set → done
         if (e.sets.every(x => x.done)) exJustDone = true
       }
