@@ -212,7 +212,7 @@ function ActiveWorkout() {
     const m = modeAt(idx)
     const cardioEntry = m === 'cardio'
     const isLastUnit = unitIdx >= units.length - 1
-    let exJustDone = false, workoutDone = false
+    let exJustDone = false, workoutDone = false, advance = false
     mutEntry(idx, e => {
       e.sets[i].done = !e.sets[i].done
       if (e.sets[i].done) {
@@ -222,9 +222,9 @@ function ActiveWorkout() {
         // Rest is per exercise (its own configured duration), not a global setting.
         const rest = (e.target && e.target.rest) || S.restSec
         if (isLastExInUnit && !unitDone) startRest(rest)
-        // Finishing an exercise also rests (its own duration) before the next one — except on
-        // the final exercise of the workout, where there's nothing to move on to.
-        else if (unitDone) { if (isLastUnit) stopRest(); else startRest(rest) }
+        // Finishing an exercise: rest (its own duration) AND jump to the next exercise, so you
+        // land on it with the rest already running — except on the workout's final exercise.
+        else if (unitDone) { if (isLastUnit) stopRest(); else { startRest(rest); advance = true } }
         if (unitDone && isLastUnit) workoutDone = true      // last exercise's last set → done
         if (e.sets.every(x => x.done)) exJustDone = true
       }
@@ -232,6 +232,7 @@ function ActiveWorkout() {
     // No more "confirm your working weight" step — next time each set is seeded from what it
     // actually was this time (see buildSets).
     if (workoutDone) workoutCompleteSheet()
+    else if (advance) update(s => { s.active.cur = units[unitIdx + 1][0] })   // auto-advance to next exercise
     else if (exJustDone && cardioEntry) useUI.getState().toast(t('Cardio logged'))
     else if (exJustDone && m === 'time') useUI.getState().toast(t('Hold logged'))
   }
