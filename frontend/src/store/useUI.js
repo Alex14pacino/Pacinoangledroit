@@ -70,16 +70,11 @@ export const useUI = create((set, get) => ({
     pushRestTimer(left)
   },
   stopRest() {
-    const tm = get().timer
-    // Remember the rest that was actually taken: it becomes the default rest for exercises
-    // added next (issue: default rest = last consumed). Persisted locally, no server push.
-    if (tm && tm.startedAt) {
-      const elapsed = Math.max(1, Math.round((Date.now() - tm.startedAt) / 1000))
-      useStore.getState().update(s => { s.restSec = elapsed }, false)
-    }
+    // No "last consumed rest" carry-over: rest durations come only from the exercise config
+    // (between sets) or a fixed value (between exercises), never from what was actually taken.
     if (timerInt) clearInterval(timerInt); timerInt = null
     if (timerTick) document.removeEventListener('visibilitychange', timerTick); timerTick = null
-    if (tm) cancelPushRestTimer()
+    if (get().timer) cancelPushRestTimer()
     set({ timer: null })
   },
 

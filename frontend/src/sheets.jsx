@@ -534,7 +534,7 @@ function ExConfig({ ex, existing, onSave, onDelete, close, routine }) {
     if (bw !== isBodyweightEq(ex.id)) flags.bodyweight = bw
     // Free-text note + this exercise's own rest time (seconds). Both ride along on the config.
     const note = (c.note || '').trim()
-    const rest = Math.max(0, Math.round(Number(c.rest ?? st.restSec ?? 90)) || 0)
+    const rest = Math.max(0, Math.round(Number(c.rest ?? 120)) || 0)
     const meta = { ...(note ? { note } : {}), ...(rest ? { rest } : {}) }
     if (cardio) onSave({ sets, min: Math.max(1, Math.round(c.min) || 20), speed: Math.max(0, c.speed || 8), ...meta })
     else if (mode === 'time') onSave({ sets: 1, mode: 'time', sec: Math.max(1, Math.round(c.sec) || 45), ...flags, ...prog, ...meta })
@@ -578,7 +578,7 @@ function ExConfig({ ex, existing, onSave, onDelete, close, routine }) {
       </>}
     </div>
     <div className="row cfgrow" style={{ marginBottom: 14 }}>
-      <Stepper label={t('Rest (s)')} value={c.rest ?? (st.restSec || 90)} step={15} decimal={false} unit="s"
+      <Stepper label={t('Rest (s)')} value={c.rest ?? 120} step={15} decimal={false} unit="s"
         onChange={v => setC(x => ({ ...x, rest: v }))} />
     </div>
     <div style={{ marginBottom: 16 }}>

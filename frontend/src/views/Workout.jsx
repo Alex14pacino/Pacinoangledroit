@@ -219,12 +219,12 @@ function ActiveWorkout() {
         beep(S.sound, 1040, 0.12); vibrate(30)
         const isLastExInUnit = idx === unit[unit.length - 1]
         const unitDone = unit.every(ui => (ui === idx ? e : A.entries[ui]).sets.every(x => x.done))
-        // Rest is per exercise (its own configured duration), not a global setting.
-        const rest = (e.target && e.target.rest) || S.restSec
-        if (isLastExInUnit && !unitDone) startRest(rest)
-        // Finishing an exercise: rest (its own duration) AND jump to the next exercise, so you
-        // land on it with the rest already running — except on the workout's final exercise.
-        else if (unitDone) { if (isLastUnit) stopRest(); else { startRest(rest); advance = true } }
+        // Between sets: this exercise's configured rest (fallback 120 s). No carry-over.
+        const setRest = (e.target && e.target.rest) || 120
+        if (isLastExInUnit && !unitDone) startRest(setRest)
+        // Finishing an exercise: a fixed 120 s rest, then jump to the next exercise so you land
+        // on it with the rest already running — except on the workout's final exercise.
+        else if (unitDone) { if (isLastUnit) stopRest(); else { startRest(120); advance = true } }
         if (unitDone && isLastUnit) workoutDone = true      // last exercise's last set → done
         if (e.sets.every(x => x.done)) exJustDone = true
       }
