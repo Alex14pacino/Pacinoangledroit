@@ -37,11 +37,12 @@ export const useUI = create((set, get) => ({
     toastTm = setTimeout(() => set({ toastMsg: '' }), 2200)
   },
 
-  startRest(sec) {
+  startRest(sec, opts = {}) {
     get().stopRest()
     const now = Date.now()
     const endsAt = now + sec * 1000
-    set({ timer: { left: sec, total: sec, endsAt, startedAt: now } })
+    // showNext: this is a between-exercises rest, so the rest screen previews the next exercise.
+    set({ timer: { left: sec, total: sec, endsAt, startedAt: now, showNext: !!opts.showNext } })
     pushRestTimer(sec)
     timerTick = () => {
       const tm = get().timer

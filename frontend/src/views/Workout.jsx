@@ -224,7 +224,7 @@ function ActiveWorkout() {
         if (isLastExInUnit && !unitDone) startRest(setRest)
         // Finishing an exercise: a fixed 120 s rest, then jump to the next exercise so you land
         // on it with the rest already running — except on the workout's final exercise.
-        else if (unitDone) { if (isLastUnit) stopRest(); else { startRest(120); advance = true } }
+        else if (unitDone) { if (isLastUnit) stopRest(); else { startRest(120, { showNext: true }); advance = true } }
         if (unitDone && isLastUnit) workoutDone = true      // last exercise's last set → done
         if (e.sets.every(x => x.done)) exJustDone = true
       }

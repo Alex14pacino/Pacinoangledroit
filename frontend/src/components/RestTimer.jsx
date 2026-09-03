@@ -60,7 +60,7 @@ export default function RestTimer() {
       <div style={{ width: 'min(520px, 82vw)', height: 8, background: 'var(--surface-3)', borderRadius: 99, overflow: 'hidden' }}>
         <i style={{ display: 'block', height: '100%', width: pct + '%', background: 'var(--acc)', transition: 'width 1s linear' }} />
       </div>
-      {nextEx && <div style={{ display: 'flex', alignItems: 'center', gap: 12, width: 'min(440px, 90vw)', background: 'var(--surface-2)', border: 'var(--hair) solid var(--sep)', borderRadius: 14, padding: '8px 12px' }}>
+      {timer.showNext && nextEx && <div style={{ display: 'flex', alignItems: 'center', gap: 12, width: 'min(440px, 90vw)', background: 'var(--surface-2)', border: 'var(--hair) solid var(--sep)', borderRadius: 14, padding: '8px 12px' }}>
         <img src={imgSrc(nextEx)} alt="" style={{ width: 54, height: 54, borderRadius: 10, objectFit: 'cover', background: '#fff', flex: 'none' }} />
         <div style={{ textAlign: 'left', minWidth: 0 }}>
           <div style={{ fontSize: 11, letterSpacing: '.12em', textTransform: 'uppercase', color: 'var(--label-2)', fontWeight: 700 }}>{t('Up next')}</div>
