@@ -219,6 +219,7 @@ export default {
   'Activate a plan first': 'Active d’abord un plan',
   'Starter plan loaded — Push · Pull · Legs': 'Plan de départ chargé — Push · Pull · Jambes',
   'Notes': 'Remarques',
+  'Up next': 'À suivre',
   'Rest (s)': 'Repos (s)',
   'Tags': 'Tags',
   'limit which exercises are suggested here': 'limite les exercices proposés ici',

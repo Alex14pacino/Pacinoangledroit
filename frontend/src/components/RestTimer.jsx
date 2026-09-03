@@ -1,5 +1,7 @@
 import { useEffect } from 'react'
 import { useUI } from '../store/useUI.js'
+import { useStore } from '../store/useStore.js'
+import { exOr, imgSrc } from '../lib/exercises.js'
 import { t } from '../lib/i18n.js'
 import { Button } from './ui.jsx'
 
@@ -12,6 +14,7 @@ const clock = sec => Math.floor(sec / 60) + ':' + String(sec % 60).padStart(2, '
 export default function RestTimer() {
   const timer = useUI(s => s.timer)
   const work = useUI(s => s.work)
+  const active = useStore(s => s.S.active)
   const { addRest, stopRest, finishWorkEarly, stopWork } = useUI()
   const on = work || timer
   // The bar is fixed above the tab bar and floats over whatever is beneath it — during a
@@ -22,6 +25,10 @@ export default function RestTimer() {
   }, [!!on])
   if (!on) return null
   const pct = (on.left / on.total) * 100
+  // The exercise the app is now on — during a between-exercises rest that's the next one, so
+  // the rest screen can show what's coming up.
+  const entry = active && active.entries && active.entries.length ? active.entries[Math.min(active.cur || 0, active.entries.length - 1)] : null
+  const nextEx = entry ? exOr(entry.id) : null
 
   if (work) return (
     <div id="timer" className="working">
@@ -53,6 +60,13 @@ export default function RestTimer() {
       <div style={{ width: 'min(520px, 82vw)', height: 8, background: 'var(--surface-3)', borderRadius: 99, overflow: 'hidden' }}>
         <i style={{ display: 'block', height: '100%', width: pct + '%', background: 'var(--acc)', transition: 'width 1s linear' }} />
       </div>
+      {nextEx && <div style={{ display: 'flex', alignItems: 'center', gap: 12, width: 'min(440px, 90vw)', background: 'var(--surface-2)', border: 'var(--hair) solid var(--sep)', borderRadius: 14, padding: '8px 12px' }}>
+        <img src={imgSrc(nextEx)} alt="" style={{ width: 54, height: 54, borderRadius: 10, objectFit: 'cover', background: '#fff', flex: 'none' }} />
+        <div style={{ textAlign: 'left', minWidth: 0 }}>
+          <div style={{ fontSize: 11, letterSpacing: '.12em', textTransform: 'uppercase', color: 'var(--label-2)', fontWeight: 700 }}>{t('Up next')}</div>
+          <div className="capitalize" style={{ fontWeight: 600, lineHeight: 1.2, overflow: 'hidden', textOverflow: 'ellipsis' }}>{nextEx.n}</div>
+        </div>
+      </div>}
       <div style={{ display: 'flex', gap: 10, width: 'min(440px, 90vw)' }}>
         <Button icon="minus" onClick={() => addRest(-15)}>15s</Button>
         <Button icon="plus" onClick={() => addRest(15)}>15s</Button>
